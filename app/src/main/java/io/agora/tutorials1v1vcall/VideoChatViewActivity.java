@@ -1,26 +1,25 @@
 package io.agora.tutorials1v1vcall;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import io.agora.uikit.logger.LoggerRecyclerView;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
 import io.agora.rtc.video.VideoCanvas;
 import io.agora.rtc.video.VideoEncoderConfiguration;
+import io.agora.uikit.logger.LoggerRecyclerView;
 
 public class VideoChatViewActivity extends AppCompatActivity {
     private static final String TAG = VideoChatViewActivity.class.getSimpleName();
@@ -90,6 +89,8 @@ public class VideoChatViewActivity extends AppCompatActivity {
             });
         }
     };
+    private String APPID;
+    private String channelName;
 
     private void setupRemoteVideo(int uid) {
         // Only one remote video view is available for this
@@ -118,6 +119,10 @@ public class VideoChatViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_chat_view);
         initUI();
+
+        Intent intent = getIntent();
+        APPID = intent.getStringExtra("APPID");
+        channelName = intent.getStringExtra("CHANNEL");
 
         // Ask for permissions at runtime.
         // This is just an example set of permissions. Other permissions
@@ -179,7 +184,7 @@ public class VideoChatViewActivity extends AppCompatActivity {
 
     private void initializeEngine() {
         try {
-            mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_app_id), mRtcEventHandler);
+            mRtcEngine = RtcEngine.create(getBaseContext(), APPID, mRtcEventHandler);
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
             throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
@@ -220,7 +225,7 @@ public class VideoChatViewActivity extends AppCompatActivity {
         // same channel successfully using the same app id.
         // 2. One token is only valid for the channel name that
         // you use to generate this token.
-        mRtcEngine.joinChannel(null, "demoChannel1", "Extra Optional Data", 0);
+        mRtcEngine.joinChannel(null, channelName, "Extra Optional Data", 0);
     }
 
     @Override
