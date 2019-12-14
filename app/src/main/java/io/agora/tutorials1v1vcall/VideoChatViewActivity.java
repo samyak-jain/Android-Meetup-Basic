@@ -96,15 +96,7 @@ public class VideoChatViewActivity extends AppCompatActivity {
         // tutorial. Here we check if there exists a surface
         // view tagged as this uid.
         int count = mRemoteContainer.getChildCount();
-        View view = null;
-        for (int i = 0; i < count; i++) {
-            View v = mRemoteContainer.getChildAt(i);
-            if (v.getTag() instanceof Integer && ((int) v.getTag()) == uid) {
-                view = v;
-            }
-        }
-
-        if (view != null) {
+        if (count > 1) {
             return;
         }
 
@@ -115,10 +107,6 @@ public class VideoChatViewActivity extends AppCompatActivity {
     }
 
     private void onRemoteUserLeft() {
-        removeRemoteVideo();
-    }
-
-    private void removeRemoteVideo() {
         if (mRemoteView != null) {
             mRemoteContainer.removeView(mRemoteView);
         }
@@ -150,15 +138,6 @@ public class VideoChatViewActivity extends AppCompatActivity {
         mSwitchCameraBtn = findViewById(R.id.btn_switch_camera);
 
         mLogView = findViewById(R.id.log_recycler_view);
-
-        // Sample logs are optional.
-        showSampleLogs();
-    }
-
-    private void showSampleLogs() {
-        mLogView.logI("Welcome to Agora 1v1 video call");
-        mLogView.logW("You will see custom logs here");
-        mLogView.logE("You can also use this to show errors");
     }
 
     private boolean checkSelfPermission(String permission, int requestCode) {
@@ -179,8 +158,6 @@ public class VideoChatViewActivity extends AppCompatActivity {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED ||
                     grantResults[1] != PackageManager.PERMISSION_GRANTED ||
                     grantResults[2] != PackageManager.PERMISSION_GRANTED) {
-                showLongToast("Need permissions " + Manifest.permission.RECORD_AUDIO +
-                        "/" + Manifest.permission.CAMERA + "/" + Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 finish();
                 return;
             }
@@ -189,15 +166,6 @@ public class VideoChatViewActivity extends AppCompatActivity {
             // The permissions can also be granted in the system settings manually.
             initEngineAndJoinChannel();
         }
-    }
-
-    private void showLongToast(final String msg) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     private void initEngineAndJoinChannel() {
@@ -252,11 +220,7 @@ public class VideoChatViewActivity extends AppCompatActivity {
         // same channel successfully using the same app id.
         // 2. One token is only valid for the channel name that
         // you use to generate this token.
-        String token = getString(R.string.agora_access_token);
-        if (TextUtils.isEmpty(token) || TextUtils.equals(token, "#YOUR ACCESS TOKEN#")) {
-            token = null; // default, no token
-        }
-        mRtcEngine.joinChannel(token, "demoChannel1", "Extra Optional Data", 0);
+        mRtcEngine.joinChannel(null, "demoChannel1", "Extra Optional Data", 0);
     }
 
     @Override
@@ -304,7 +268,7 @@ public class VideoChatViewActivity extends AppCompatActivity {
 
     private void endCall() {
         removeLocalVideo();
-        removeRemoteVideo();
+        onRemoteUserLeft();
         leaveChannel();
     }
 
